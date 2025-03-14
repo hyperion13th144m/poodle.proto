@@ -2,52 +2,64 @@ syntax = "proto3";
 
 package poodle;
 
-enum Method {
-    GET = 0;
-    POST = 1;
-}
-
 enum Result {
     OK = 0;
     NG = 1;
 }
 
-message ContentListRequest {
+enum CheckResult {
+    EXISTS = 0;
+    NOT_EXISTS = 1;
+}
+
+message ContentId {
     string id = 1;
+}
+
+message CheckResponse {
+    CheckResult result = 1;
 }
 
 message ContentList {
     repeated string name = 1;
 }
 
-message ContentRequest {
-    Method method = 1;
-    string id = 2;
-    string name = 3;
+message GetContentArgs {
+    string id = 1;
+    string name = 2;
+}
+
+message PostContentArgs {
+    string id = 1;
+    string name = 2;
     oneof content {
         string string_content = 4;
         bytes binary_content = 5;
     }
 }
 
-message Content {
+message GetContentResponse {
+    Result result = 1;
     oneof content {
-        string string_content = 1;
-        bytes binary_content = 2;
+        string string_content = 2;
+        bytes binary_content = 3;
     }
 }
 
-message PostResult {
+message PostContentResponse {
     Result result = 1;
 }
 
 service ContentAPI {
+    /* check if content exists */
+    rpc CheckIfExists (ContentId) returns (CheckResponse);
+
     /* get the content list of the document */
-    rpc GetContentList (ContentListRequest) returns (ContentList);
+    rpc GetContentList (ContentId) returns (ContentList);
 
     /* get the content */
-    rpc GetContent (ContentRequest) returns (Content);
+    rpc GetContent (GetContentArgs) returns (GetContentResponse);
 
-    /* post the content */
-    rpc PostContent (ContentRequest) returns (PostResult);
+    /* get the content */
+    rpc PostContent (PostContentArgs) returns (PostContentResponse);
 }
