@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package poodle;
+
+enum Method {
+    GET = 0;
+    POST = 1;
+}
+
+enum Result {
+    OK = 0;
+    NG = 1;
+}
+
+message ContentListRequest {
+    string id = 1;
+}
+
+message ContentList {
+    repeated string name = 1;
+}
+
+message ContentRequest {
+    Method method = 1;
+    string id = 2;
+    string name = 3;
+    oneof content {
+        string string_content = 4;
+        bytes binary_content = 5;
+    }
+}
+
+message Content {
+    oneof content {
+        string string_content = 1;
+        bytes binary_content = 2;
+    }
+}
+
+message PostResult {
+    Result result = 1;
+}
+
+service ContentAPI {
+    /* get the content list of the document */
+    rpc GetContentList (ContentListRequest) returns (ContentList);
+
+    /* get the content */
+    rpc GetContent (ContentRequest) returns (Content);
+
+    /* post the content */
+    rpc PostContent (ContentRequest) returns (PostResult);
+}
